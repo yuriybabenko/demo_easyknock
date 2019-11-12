@@ -19,7 +19,7 @@
   "dependencies": {
     "express": "~4.16.4",
     "path": "~0.12.7",
-    "react": "~16.6.0",
+    "react": "^16.11.0",
     "react-dom": "~16.6.0",
     "request": "^2.88.0",
     "ts-loader": "~5.3.0",
