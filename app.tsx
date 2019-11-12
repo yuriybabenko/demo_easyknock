@@ -48,7 +48,7 @@ export class PropertiesList extends React.Component {
         // Table rows are composed of PropertyRow components. Row data and
         // index are passed as props.
         var rows = this.state.properties.map((row, index) => {
-            return (<PropertyRow propertyData={row} propertyIndex={index} key={index} />);
+            return (<PropertyRow propertyData={row} propertyIndex={index} key={row.ListingId} />);
         });
 
         return (

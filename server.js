@@ -14,7 +14,6 @@ app.use(express.static(staticPath, {
 }));
 
 // Set up routes via Express' router. Optional handling for params, middleware.
-// const router = express.Router();
 const router = express.Router();
 
 router.get('/api/properties', function (req, res) {

@@ -146,7 +146,8 @@ var PropertiesList = /** @class */ (function (_super) {
         // Table rows are composed of PropertyRow components. Row data and
         // index are passed as props.
         var rows = this.state.properties.map(function (row, index) {
-            return (React.createElement(PropertyRow, { propertyData: row, propertyIndex: index, key: index }));
+            console.log('id: ' + row.ListingId);
+            return (React.createElement(PropertyRow, { propertyData: row, propertyIndex: index, key: row.ListingId }));
         });
         return (React.createElement("div", { id: "properties" },
             React.createElement("h1", null, "Properties List"),
