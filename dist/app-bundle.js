@@ -109,6 +109,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+var react_1 = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 var ReactDOM = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
 var PropertiesList = /** @class */ (function (_super) {
@@ -146,7 +147,7 @@ var PropertiesList = /** @class */ (function (_super) {
         // Table rows are composed of PropertyRow components. Row data and
         // index are passed as props.
         var rows = this.state.properties.map(function (row, index) {
-            return (React.createElement(PropertyRow, { propertyData: row, propertyIndex: index, key: row.ListingId }));
+            return (React.createElement(PropRow, { propertyData: row, propertyIndex: index, key: row.ListingId }));
         });
         return (React.createElement("div", { id: "properties" },
             React.createElement("h1", null, "Properties List"),
@@ -159,7 +160,13 @@ var PropertiesList = /** @class */ (function (_super) {
     return PropertiesList;
 }(React.Component));
 exports.PropertiesList = PropertiesList;
+/**
+ * test
+ */
 // Child component representing an individual row in the PropertiesList parent.
+//
+// Traditional implementation.
+//
 // Encapsulating each row in a component instance simplifies access to and
 // control of that row's state.
 var PropertyRow = /** @class */ (function (_super) {
@@ -221,6 +228,41 @@ var PropertyRow = /** @class */ (function (_super) {
     return PropertyRow;
 }(React.Component));
 exports.PropertyRow = PropertyRow;
+function PropRow(props) {
+    var _a = react_1.useState(props.propertyData), propertyData = _a[0], setPropertyData = _a[1];
+    var _b = react_1.useState(props.propertyIndex), propertyIndex = _b[0], setPropertyIndex = _b[1];
+    var _c = react_1.useState(''), lookupProperty = _c[0], setLookupProperty = _c[1];
+    var _d = react_1.useState(''), lookupValue = _d[0], setLookupValue = _d[1];
+    // An onClick handler for the "Look Up" button. Queries row state for the
+    // data property requested by the user.
+    var getLookupVal = function () {
+        var lookupValue = '';
+        // Rudimentary validation & error handling.
+        if (!lookupProperty) {
+            lookupValue = 'Please enter an Item Name to look up.';
+        }
+        else if (propertyData[lookupProperty] == undefined) {
+            lookupValue = 'Specified Item Name is not set.';
+        }
+        else {
+            lookupValue = propertyData[lookupProperty];
+            // Data is re-encoded into JSON to simplify visual display of complex
+            // objects.
+            lookupValue = JSON.stringify(lookupValue);
+        }
+        // Update state with the result of our query; two-way binding will show
+        // it to the user.
+        setLookupValue(lookupValue);
+    };
+    return (React.createElement("tr", { key: propertyIndex },
+        React.createElement("td", null, propertyData.ListingId),
+        React.createElement("td", null,
+            React.createElement("input", { type: "text", className: "form-input", placeholder: "Item name", onChange: function (event) {
+                    setLookupProperty(event.target.value.trim());
+                } }),
+            React.createElement("button", { type: "submit", className: "form-submit", onClick: getLookupVal }, "Look up")),
+        React.createElement("td", null, lookupValue)));
+}
 ReactDOM.render(React.createElement(PropertiesList, null), document.getElementById('root'));
 
 

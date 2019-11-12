@@ -1,5 +1,7 @@
 declare var require: any
 
+import { useState } from 'react';
+
 var React = require('react');
 var ReactDOM = require('react-dom');
 
@@ -48,7 +50,7 @@ export class PropertiesList extends React.Component {
         // Table rows are composed of PropertyRow components. Row data and
         // index are passed as props.
         var rows = this.state.properties.map((row, index) => {
-            return (<PropertyRow propertyData={row} propertyIndex={index} key={row.ListingId} />);
+            return (<PropertyRowModern propertyData={row} propertyIndex={index} key={row.ListingId} />);
         });
 
         return (
@@ -68,10 +70,68 @@ export class PropertiesList extends React.Component {
     }
 }
 
-// Child component representing an individual row in the PropertiesList parent.
-// Encapsulating each row in a component instance simplifies access to and
-// control of that row's state.
-export class PropertyRow extends React.Component {
+/**
+ * Child component representing an individual row in the PropertiesList parent.
+ *
+ * Modern, functional implementation using state hook.
+ *
+ * Encapsulating each row in a component instance simplifies access to and
+ * control of that row's state.
+ */
+function PropertyRowModern(props) {
+    const [propertyData, setPropertyData] = useState(props.propertyData);
+    const [propertyIndex, setPropertyIndex] = useState(props.propertyIndex);
+    const [lookupProperty, setLookupProperty] = useState('');
+    const [lookupValue, setLookupValue] = useState('');
+
+    // An onClick handler for the "Look Up" button. Queries row state for the
+    // data property requested by the user.
+    var getLookupVal = function () {
+        var lookupValue = '';
+
+        // Rudimentary validation & error handling.
+        if (!lookupProperty) {
+            lookupValue = 'Please enter an Item Name to look up.';
+        }
+        else if (propertyData[lookupProperty] == undefined) {
+            lookupValue = 'Specified Item Name is not set.';
+        }
+        else {
+            lookupValue = propertyData[lookupProperty];
+            // Data is re-encoded into JSON to simplify visual display of complex
+            // objects.
+            lookupValue = JSON.stringify(lookupValue);
+        }
+
+        // Update state with the result of our query; two-way binding will show
+        // it to the user.
+        setLookupValue(lookupValue);
+    };
+
+    return (
+        <tr key={ propertyIndex }>
+            <td>{ propertyData.ListingId }</td>
+            <td>
+                <input type="text" className="form-input" placeholder="Item name" onChange={ (event) => {
+                    setLookupProperty(event.target.value.trim());
+                } } />
+
+                <button type="submit" className="form-submit" onClick={ getLookupVal }>Look up</button>
+            </td>
+            <td>{ lookupValue }</td>
+        </tr>
+    );
+}
+
+/**
+ * Child component representing an individual row in the PropertiesList parent.
+ *
+ * Traditional implementation.
+ *
+ * Encapsulating each row in a component instance simplifies access to and
+ * control of that row's state.
+ */
+export class PropertyRowTraditional extends React.Component {
     constructor(props) {
         super(props);
 
