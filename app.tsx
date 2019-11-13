@@ -5,69 +5,65 @@ import { useState } from 'react';
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-export class PropertiesList extends React.Component {
-    constructor() {
-        super();
+/**
+ * Parent component representing the properties table and raw JSON
+ * output below it.
+ *
+ * Modern, functional implementation using state hook.
+ */
+function PropertiesListModern() {
+    const [properties, setProperties] = useState([]);
+    const [rawResponseData, setRawResponseData] = useState([]);
 
-        this.state = {
-            properties: [],
-            rawResponseData: [],
-        };
+    var fetch = require('whatwg-fetch');
+    fetch.fetch('/api/properties').then((response) => {
+        return response.json();
+    }).then((json) => {
+        setProperties(json.value);
+        setRawResponseData(json);
+    }).catch((ex) => {
+        console.log('Parsing failed.', ex)
+    })
 
-        var fetch = require('whatwg-fetch');
-        fetch.fetch('/api/properties').then((response) => {
-            return response.json();
-        }).then((json) => {
-            this.setState({
-                properties: json.value,
-                rawResponseData: json
-            });
-        }).catch((ex) => {
-            console.log('Parsing failed.', ex)
-        })
-    }
-
-    render() {
-        // If there are any issues getting the data, backend will return an
-        // empty JSON object.
-        if (!this.state.properties) {
-            return (
-                <div class="error">
-                    No property data available.
-                </div>
-            );
-        }
-
-        // Table header.
-        var header = (
-            <tr>
-                <th>Listing ID</th>
-                <th></th>
-                <th></th>
-            </tr>
-        );
-
-        // Table rows are composed of PropertyRow components. Row data and
-        // index are passed as props.
-        var rows = this.state.properties.map((row, index) => {
-            return (<PropertyRowModern propertyData={row} propertyIndex={index} key={row.ListingId} />);
-        });
-
+    // If there are any issues getting the data, backend will return an
+    // empty JSON object.
+    if (!properties) {
         return (
-            <div id="properties">
-                <h1>Properties List</h1>
-                <table id="properties-list">
-                    <thead>{ header }</thead>
-                    <tbody>{ rows }</tbody>
-                </table>
-
-                <h1>Parsed API output.</h1>
-                <div id="rawOutput">
-                    { JSON.stringify(this.state.rawResponseData) }
-                </div>
+            <div class="error">
+                No property data available.
             </div>
         );
     }
+
+    // Table header.
+    var header = (
+        <tr>
+            <th>Listing ID</th>
+            <th></th>
+            <th></th>
+        </tr>
+    );
+
+    // Table rows are composed of PropertyRow components. Row data and
+    // index are passed as props.
+    var rows = properties.map((row, index) => {
+        return (<PropertyRowModern propertyData={row} propertyIndex={index} key={row.ListingId} />);
+    });
+
+    return (
+        <div id="properties">
+            <h1>Properties List</h1>
+            <table id="properties-list">
+                <thead>{ header }</thead>
+                <tbody>{ rows }</tbody>
+            </table>
+
+            <h1>Parsed API output.</h1>
+            <div id="rawOutput">
+                { JSON.stringify(rawResponseData) }
+            </div>
+        </div>
+    );
 }
 
 /**
@@ -121,6 +117,84 @@ function PropertyRowModern(props) {
             <td>{ lookupValue }</td>
         </tr>
     );
+}
+
+// --
+// --
+// -- Original, "traditional-style" implementation of both components
+// -- below.
+// --
+// --
+
+/**
+ * Parent component representing the properties table and raw JSON
+ * output below it.
+ *
+ * Traditional implementation.
+ */
+export class PropertiesListTraditional extends React.Component {
+    constructor() {
+        super();
+
+        this.state = {
+            properties: [],
+            rawResponseData: [],
+        };
+
+        var fetch = require('whatwg-fetch');
+        fetch.fetch('/api/properties').then((response) => {
+            return response.json();
+        }).then((json) => {
+            this.setState({
+                properties: json.value,
+                rawResponseData: json
+            });
+        }).catch((ex) => {
+            console.log('Parsing failed.', ex)
+        })
+    }
+
+    render() {
+        // If there are any issues getting the data, backend will return an
+        // empty JSON object.
+        if (!this.state.properties) {
+            return (
+                <div class="error">
+                    No property data available.
+                </div>
+            );
+        }
+
+        // Table header.
+        var header = (
+            <tr>
+                <th>Listing ID</th>
+                <th></th>
+                <th></th>
+            </tr>
+        );
+
+        // Table rows are composed of PropertyRow components. Row data and
+        // index are passed as props.
+        var rows = this.state.properties.map((row, index) => {
+            return (<PropertyRowTraditional propertyData={row} propertyIndex={index} key={row.ListingId} />);
+        });
+
+        return (
+            <div id="properties">
+                <h1>Properties List</h1>
+                <table id="properties-list">
+                    <thead>{ header }</thead>
+                    <tbody>{ rows }</tbody>
+                </table>
+
+                <h1>Parsed API output.</h1>
+                <div id="rawOutput">
+                    { JSON.stringify(this.state.rawResponseData) }
+                </div>
+            </div>
+        );
+    }
 }
 
 /**
@@ -197,4 +271,4 @@ export class PropertyRowTraditional extends React.Component {
     }
 }
 
-ReactDOM.render(<PropertiesList />, document.getElementById('root'));
+ReactDOM.render(<PropertiesListModern />, document.getElementById('root'));

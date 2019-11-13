@@ -112,9 +112,105 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var react_1 = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 var React = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 var ReactDOM = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
-var PropertiesList = /** @class */ (function (_super) {
-    __extends(PropertiesList, _super);
-    function PropertiesList() {
+/**
+ * Parent component representing the properties table and raw JSON
+ * output below it.
+ *
+ * Modern, functional implementation using state hook.
+ */
+function PropertiesListModern() {
+    var _a = react_1.useState([]), properties = _a[0], setProperties = _a[1];
+    var _b = react_1.useState([]), rawResponseData = _b[0], setRawResponseData = _b[1];
+    var fetch = __webpack_require__(/*! whatwg-fetch */ "./node_modules/whatwg-fetch/fetch.js");
+    fetch.fetch('/api/properties').then(function (response) {
+        return response.json();
+    }).then(function (json) {
+        setProperties(json.value);
+        setRawResponseData(json);
+    }).catch(function (ex) {
+        console.log('Parsing failed.', ex);
+    });
+    // If there are any issues getting the data, backend will return an
+    // empty JSON object.
+    if (!properties) {
+        return (React.createElement("div", { class: "error" }, "No property data available."));
+    }
+    // Table header.
+    var header = (React.createElement("tr", null,
+        React.createElement("th", null, "Listing ID"),
+        React.createElement("th", null),
+        React.createElement("th", null)));
+    // Table rows are composed of PropertyRow components. Row data and
+    // index are passed as props.
+    var rows = properties.map(function (row, index) {
+        return (React.createElement(PropertyRowModern, { propertyData: row, propertyIndex: index, key: row.ListingId }));
+    });
+    return (React.createElement("div", { id: "properties" },
+        React.createElement("h1", null, "Properties List"),
+        React.createElement("table", { id: "properties-list" },
+            React.createElement("thead", null, header),
+            React.createElement("tbody", null, rows)),
+        React.createElement("h1", null, "Parsed API output."),
+        React.createElement("div", { id: "rawOutput" }, JSON.stringify(rawResponseData))));
+}
+/**
+ * Child component representing an individual row in the PropertiesList parent.
+ *
+ * Modern, functional implementation using state hook.
+ *
+ * Encapsulating each row in a component instance simplifies access to and
+ * control of that row's state.
+ */
+function PropertyRowModern(props) {
+    var _a = react_1.useState(props.propertyData), propertyData = _a[0], setPropertyData = _a[1];
+    var _b = react_1.useState(props.propertyIndex), propertyIndex = _b[0], setPropertyIndex = _b[1];
+    var _c = react_1.useState(''), lookupProperty = _c[0], setLookupProperty = _c[1];
+    var _d = react_1.useState(''), lookupValue = _d[0], setLookupValue = _d[1];
+    // An onClick handler for the "Look Up" button. Queries row state for the
+    // data property requested by the user.
+    var getLookupVal = function () {
+        var lookupValue = '';
+        // Rudimentary validation & error handling.
+        if (!lookupProperty) {
+            lookupValue = 'Please enter an Item Name to look up.';
+        }
+        else if (propertyData[lookupProperty] == undefined) {
+            lookupValue = 'Specified Item Name is not set.';
+        }
+        else {
+            lookupValue = propertyData[lookupProperty];
+            // Data is re-encoded into JSON to simplify visual display of complex
+            // objects.
+            lookupValue = JSON.stringify(lookupValue);
+        }
+        // Update state with the result of our query; two-way binding will show
+        // it to the user.
+        setLookupValue(lookupValue);
+    };
+    return (React.createElement("tr", { key: propertyIndex },
+        React.createElement("td", null, propertyData.ListingId),
+        React.createElement("td", null,
+            React.createElement("input", { type: "text", className: "form-input", placeholder: "Item name", onChange: function (event) {
+                    setLookupProperty(event.target.value.trim());
+                } }),
+            React.createElement("button", { type: "submit", className: "form-submit", onClick: getLookupVal }, "Look up")),
+        React.createElement("td", null, lookupValue)));
+}
+// --
+// --
+// -- Original, "traditional-style" implementation of both components
+// -- below.
+// --
+// --
+/**
+ * Parent component representing the properties table and raw JSON
+ * output below it.
+ *
+ * Traditional implementation.
+ */
+var PropertiesListTraditional = /** @class */ (function (_super) {
+    __extends(PropertiesListTraditional, _super);
+    function PropertiesListTraditional() {
         var _this = _super.call(this) || this;
         _this.state = {
             properties: [],
@@ -133,7 +229,7 @@ var PropertiesList = /** @class */ (function (_super) {
         });
         return _this;
     }
-    PropertiesList.prototype.render = function () {
+    PropertiesListTraditional.prototype.render = function () {
         // If there are any issues getting the data, backend will return an
         // empty JSON object.
         if (!this.state.properties) {
@@ -147,7 +243,7 @@ var PropertiesList = /** @class */ (function (_super) {
         // Table rows are composed of PropertyRow components. Row data and
         // index are passed as props.
         var rows = this.state.properties.map(function (row, index) {
-            return (React.createElement(PropRow, { propertyData: row, propertyIndex: index, key: row.ListingId }));
+            return (React.createElement(PropertyRowTraditional, { propertyData: row, propertyIndex: index, key: row.ListingId }));
         });
         return (React.createElement("div", { id: "properties" },
             React.createElement("h1", null, "Properties List"),
@@ -157,21 +253,20 @@ var PropertiesList = /** @class */ (function (_super) {
             React.createElement("h1", null, "Parsed API output."),
             React.createElement("div", { id: "rawOutput" }, JSON.stringify(this.state.rawResponseData))));
     };
-    return PropertiesList;
+    return PropertiesListTraditional;
 }(React.Component));
-exports.PropertiesList = PropertiesList;
+exports.PropertiesListTraditional = PropertiesListTraditional;
 /**
- * test
+ * Child component representing an individual row in the PropertiesList parent.
+ *
+ * Traditional implementation.
+ *
+ * Encapsulating each row in a component instance simplifies access to and
+ * control of that row's state.
  */
-// Child component representing an individual row in the PropertiesList parent.
-//
-// Traditional implementation.
-//
-// Encapsulating each row in a component instance simplifies access to and
-// control of that row's state.
-var PropertyRow = /** @class */ (function (_super) {
-    __extends(PropertyRow, _super);
-    function PropertyRow(props) {
+var PropertyRowTraditional = /** @class */ (function (_super) {
+    __extends(PropertyRowTraditional, _super);
+    function PropertyRowTraditional(props) {
         var _this = _super.call(this, props) || this;
         // An onChange handler for user input. Tracks the input data.
         _this.setLookupProperty = function (event) {
@@ -217,7 +312,7 @@ var PropertyRow = /** @class */ (function (_super) {
         };
         return _this;
     }
-    PropertyRow.prototype.render = function () {
+    PropertyRowTraditional.prototype.render = function () {
         return (React.createElement("tr", { key: this.state.propertyIndex },
             React.createElement("td", null, this.state.propertyData.ListingId),
             React.createElement("td", null,
@@ -225,45 +320,10 @@ var PropertyRow = /** @class */ (function (_super) {
                 React.createElement("button", { type: "submit", className: "form-submit", onClick: this.getLookUpValue }, "Look up")),
             React.createElement("td", null, this.state.lookupValue)));
     };
-    return PropertyRow;
+    return PropertyRowTraditional;
 }(React.Component));
-exports.PropertyRow = PropertyRow;
-function PropRow(props) {
-    var _a = react_1.useState(props.propertyData), propertyData = _a[0], setPropertyData = _a[1];
-    var _b = react_1.useState(props.propertyIndex), propertyIndex = _b[0], setPropertyIndex = _b[1];
-    var _c = react_1.useState(''), lookupProperty = _c[0], setLookupProperty = _c[1];
-    var _d = react_1.useState(''), lookupValue = _d[0], setLookupValue = _d[1];
-    // An onClick handler for the "Look Up" button. Queries row state for the
-    // data property requested by the user.
-    var getLookupVal = function () {
-        var lookupValue = '';
-        // Rudimentary validation & error handling.
-        if (!lookupProperty) {
-            lookupValue = 'Please enter an Item Name to look up.';
-        }
-        else if (propertyData[lookupProperty] == undefined) {
-            lookupValue = 'Specified Item Name is not set.';
-        }
-        else {
-            lookupValue = propertyData[lookupProperty];
-            // Data is re-encoded into JSON to simplify visual display of complex
-            // objects.
-            lookupValue = JSON.stringify(lookupValue);
-        }
-        // Update state with the result of our query; two-way binding will show
-        // it to the user.
-        setLookupValue(lookupValue);
-    };
-    return (React.createElement("tr", { key: propertyIndex },
-        React.createElement("td", null, propertyData.ListingId),
-        React.createElement("td", null,
-            React.createElement("input", { type: "text", className: "form-input", placeholder: "Item name", onChange: function (event) {
-                    setLookupProperty(event.target.value.trim());
-                } }),
-            React.createElement("button", { type: "submit", className: "form-submit", onClick: getLookupVal }, "Look up")),
-        React.createElement("td", null, lookupValue)));
-}
-ReactDOM.render(React.createElement(PropertiesList, null), document.getElementById('root'));
+exports.PropertyRowTraditional = PropertyRowTraditional;
+ReactDOM.render(React.createElement(PropertiesListModern, null), document.getElementById('root'));
 
 
 /***/ }),
