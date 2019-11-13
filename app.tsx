@@ -47,7 +47,7 @@ function PropertiesListModern() {
     // Table rows are composed of PropertyRow components. Row data and
     // index are passed as props.
     var rows = properties.map((row, index) => {
-        return (<PropertyRowModern propertyData={row} propertyIndex={index} key={row.ListingId} />);
+        return (<PropertyRowModern propertyData={row} key={row.ListingId} />);
     });
 
     return (
@@ -76,7 +76,6 @@ function PropertiesListModern() {
  */
 function PropertyRowModern(props) {
     const [propertyData, setPropertyData] = useState(props.propertyData);
-    const [propertyIndex, setPropertyIndex] = useState(props.propertyIndex);
     const [lookupProperty, setLookupProperty] = useState('');
     const [lookupValue, setLookupValue] = useState('');
 
@@ -105,7 +104,7 @@ function PropertyRowModern(props) {
     };
 
     return (
-        <tr key={ propertyIndex }>
+        <tr key={ propertyData.ListingId + '-tr' }>
             <td>{ propertyData.ListingId }</td>
             <td>
                 <input type="text" className="form-input" placeholder="Item name" onChange={ (event) => {
@@ -177,7 +176,7 @@ export class PropertiesListTraditional extends React.Component {
         // Table rows are composed of PropertyRow components. Row data and
         // index are passed as props.
         var rows = this.state.properties.map((row, index) => {
-            return (<PropertyRowTraditional propertyData={row} propertyIndex={index} key={row.ListingId} />);
+            return (<PropertyRowTraditional propertyData={row} key={row.ListingId} />);
         });
 
         return (
@@ -213,8 +212,6 @@ export class PropertyRowTraditional extends React.Component {
             // Complete data object for this row. Straight from the API
             // and unsanitized.
             propertyData: props.propertyData,
-            // Row index.
-            propertyIndex: props.propertyIndex,
             // User input for data lookup.
             lookupProperty: '',
             // Value of last lookup query.
@@ -259,7 +256,7 @@ export class PropertyRowTraditional extends React.Component {
 
     render() {
         return (
-            <tr key={ this.state.propertyIndex }>
+            <tr key={ this.state.propertyData.ListingId + '-tr' }>
                 <td>{ this.state.propertyData.ListingId }</td>
                 <td>
                     <input type="text" className="form-input" placeholder="Item name" onChange={ this.setLookupProperty } />

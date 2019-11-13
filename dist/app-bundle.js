@@ -143,7 +143,7 @@ function PropertiesListModern() {
     // Table rows are composed of PropertyRow components. Row data and
     // index are passed as props.
     var rows = properties.map(function (row, index) {
-        return (React.createElement(PropertyRowModern, { propertyData: row, propertyIndex: index, key: row.ListingId }));
+        return (React.createElement(PropertyRowModern, { propertyData: row, key: row.ListingId }));
     });
     return (React.createElement("div", { id: "properties" },
         React.createElement("h1", null, "Properties List"),
@@ -163,9 +163,8 @@ function PropertiesListModern() {
  */
 function PropertyRowModern(props) {
     var _a = react_1.useState(props.propertyData), propertyData = _a[0], setPropertyData = _a[1];
-    var _b = react_1.useState(props.propertyIndex), propertyIndex = _b[0], setPropertyIndex = _b[1];
-    var _c = react_1.useState(''), lookupProperty = _c[0], setLookupProperty = _c[1];
-    var _d = react_1.useState(''), lookupValue = _d[0], setLookupValue = _d[1];
+    var _b = react_1.useState(''), lookupProperty = _b[0], setLookupProperty = _b[1];
+    var _c = react_1.useState(''), lookupValue = _c[0], setLookupValue = _c[1];
     // An onClick handler for the "Look Up" button. Queries row state for the
     // data property requested by the user.
     var getLookupVal = function () {
@@ -187,7 +186,7 @@ function PropertyRowModern(props) {
         // it to the user.
         setLookupValue(lookupValue);
     };
-    return (React.createElement("tr", { key: propertyIndex },
+    return (React.createElement("tr", { key: propertyData.ListingId + '-tr' },
         React.createElement("td", null, propertyData.ListingId),
         React.createElement("td", null,
             React.createElement("input", { type: "text", className: "form-input", placeholder: "Item name", onChange: function (event) {
@@ -243,7 +242,7 @@ var PropertiesListTraditional = /** @class */ (function (_super) {
         // Table rows are composed of PropertyRow components. Row data and
         // index are passed as props.
         var rows = this.state.properties.map(function (row, index) {
-            return (React.createElement(PropertyRowTraditional, { propertyData: row, propertyIndex: index, key: row.ListingId }));
+            return (React.createElement(PropertyRowTraditional, { propertyData: row, key: row.ListingId }));
         });
         return (React.createElement("div", { id: "properties" },
             React.createElement("h1", null, "Properties List"),
@@ -303,8 +302,6 @@ var PropertyRowTraditional = /** @class */ (function (_super) {
             // Complete data object for this row. Straight from the API
             // and unsanitized.
             propertyData: props.propertyData,
-            // Row index.
-            propertyIndex: props.propertyIndex,
             // User input for data lookup.
             lookupProperty: '',
             // Value of last lookup query.
@@ -313,7 +310,7 @@ var PropertyRowTraditional = /** @class */ (function (_super) {
         return _this;
     }
     PropertyRowTraditional.prototype.render = function () {
-        return (React.createElement("tr", { key: this.state.propertyIndex },
+        return (React.createElement("tr", { key: this.state.propertyData.ListingId + '-tr' },
             React.createElement("td", null, this.state.propertyData.ListingId),
             React.createElement("td", null,
                 React.createElement("input", { type: "text", className: "form-input", placeholder: "Item name", onChange: this.setLookupProperty }),
